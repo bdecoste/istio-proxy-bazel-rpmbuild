@@ -1,0 +1,1 @@
+# istio-proxy-bazel-rpmbuild
