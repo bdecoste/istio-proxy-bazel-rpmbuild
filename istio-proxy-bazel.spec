@@ -45,11 +45,11 @@ Source2:        proxy-cache.tar.gz
 The Istio Proxy is a microservice proxy that can be used on the client and server side, and forms a microservice mesh. The Proxy supports a large number of features.
 
 ########### istio-proxy ###############
-%package istio-proxy
+%package envoy
 Summary:  The istio envoy proxy
 Requires: istio-proxy = %{version}-%{release}
 
-%description istio-proxy
+%description envoy
 The Istio Proxy is a microservice proxy that can be used on the client and server side, and forms a microservice mesh. The Proxy supports a large number of features.
 
 This package contains the envoy program.
@@ -63,22 +63,34 @@ tar xvf %{SOURCE2} -C /tmp
 
 %build
 
-bazel --output_user_root=/tmp/cache version
+mkdir -p /tmp/tmpcache
+#bazel --output_user_root=/tmp/cache version
+bazel --output_user_root=/tmp/tmpcache build --config=release --fetch=false //... || :
 
-pushd /tmp/cache
-HASH=$(find . -maxdepth 1 -type d -not -name "HASH" -not -name "install" | sed "s/.//" | sed "s/\///")
-HASH=$(echo $HASH)
-rm -rf /tmp/cache/${HASH}
+pushd /tmp/tmpcache
+WORKSPACE_HASH=$(find . -maxdepth 1 -type d -not -name "HASH" -not -name "install" | sed "s/.//" | sed "s/\///")
+WORKSPACE_HASH=$(echo $WORKSPACE_HASH)
 popd
 
-mv /tmp/cache/HASH /tmp/cache/${HASH}
+pushd /tmp/tmpcache/install
+MANIFEST_HASH=$(find . -maxdepth 1 -type d -not -name "HASH" -not -name "install" | sed "s/.//" | sed "s/\///")
+MANIFEST_HASH=$(echo $MANIFEST_HASH)
+popd
+
+mv /tmp/cache/HASH /tmp/cache/${WORKSPACE_HASH}
+mv /tmp/cache/install/HASH /tmp/cache/install/${MANIFEST_HASH}
 
 bazel --output_user_root=/tmp/cache build --config=release --fetch=false //...
 
 %install
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT%{_bindir}
 
-%files
+cp -pav bazel-bin/src/envoy/envoy $RPM_BUILD_ROOT%{_bindir}/
+
+%files envoy
+%{_bindir}/envoy
 
 %changelog
-* Tue Feb 13 2018 Bill DeCoste <wdecoste@redhat.com> - 0.4.git22a8d0c
+* Mon Mar 5 2018 Bill DeCoste <wdecoste@redhat.com>
 - First package 
