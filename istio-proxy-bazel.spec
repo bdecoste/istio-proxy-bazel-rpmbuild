@@ -31,9 +31,9 @@ Summary:        The Istio Proxy is a microservice proxy that can be used on the 
 License:        ASL 2.0
 URL:            https://%{provider_prefix}
 # TODO: Change to a release version
-Source0:        proxy.tar.gz
-Source1:        bazel-0.11.0-installer-linux-x86_64.sh
-Source2:        proxy-cache.tar.gz
+Source0:        proxy-full.tar.gz
+#Source1:        bazel-0.11.0-installer-linux-x86_64.sh
+#Source2:        proxy-prefetch.tar.gz
 
 
 # e.g. el6 has ppc64 arch without gcc-go, so EA tag is required
@@ -59,36 +59,41 @@ istio-proxy is the proxy required by the Istio Pilot Agent that talks to Istio p
 %prep
 %setup -q -n %{name}
 
-INSTALLED_BAZEL=$(which bazel)
-if [[ ${INSTALLED_BAZEL} = *"no bazel in"* ]]; then
-    sh %{SOURCE1}
-fi
+#INSTALLED_BAZEL=$(which bazel)
+#if [[ ${INSTALLED_BAZEL} = *"no bazel in"* ]]; then
+#    sh %{SOURCE1}
+#fi
 
 if [[ ${PATH} != *"devtoolset"* ]]; then
     source /opt/rh/devtoolset-4/enable
 fi
 
-tar xvf %{SOURCE2} -C /tmp
+#tar xvf %{SOURCE2} -C /tmp
 
 %build
 
 #bazel --output_user_root=/tmp/cache fetch //...
-bazel --output_user_root=/tmp/tmpcache build --config=release --fetch=false //... || :
+#bazel --output_user_root=/tmp/tmpcache build --config=release --fetch=false //... || :
 
-pushd /tmp/tmpcache
-WORKSPACE_HASH=$(find . -maxdepth 1 -type d -not -name "HASH" -not -name "install" | sed "s/.//" | sed "s/\///")
-WORKSPACE_HASH=$(echo $WORKSPACE_HASH)
-popd
+#pushd /tmp/tmpcache
+#WORKSPACE_HASH=$(find . -maxdepth 1 -type d -not -name "HASH" -not -name "install" | sed "s/.//" | sed "s/\///")
+#WORKSPACE_HASH=$(echo $WORKSPACE_HASH)
+#popd
 
-pushd /tmp/tmpcache/install
-MANIFEST_HASH=$(find . -maxdepth 1 -type d -not -name "HASH" -not -name "install" | sed "s/.//" | sed "s/\///")
-MANIFEST_HASH=$(echo $MANIFEST_HASH)
-popd
+#pushd /tmp/tmpcache/install
+#MANIFEST_HASH=$(find . -maxdepth 1 -type d -not -name "HASH" -not -name "install" | sed "s/.//" | sed "s/\///")
+#MANIFEST_HASH=$(echo $MANIFEST_HASH)
+#popd
 
-mv /tmp/cache/HASH /tmp/cache/${WORKSPACE_HASH}
-mv /tmp/cache/install/HASH /tmp/cache/install/${MANIFEST_HASH}
+#mv /tmp/cache/HASH /tmp/cache/${WORKSPACE_HASH}
+#mv /tmp/cache/install/HASH /tmp/cache/install/${MANIFEST_HASH}
 
-bazel --output_user_root=/tmp/cache build --config=release --fetch=false //...
+echo "${RPM_BUILD_DIR}"
+
+pwd
+cd proxy
+
+bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root build --config=release --fetch=false //...
 
 %install
 rm -rf $RPM_BUILD_ROOT
