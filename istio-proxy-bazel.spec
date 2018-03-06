@@ -88,9 +88,6 @@ fi
 #mv /tmp/cache/HASH /tmp/cache/${WORKSPACE_HASH}
 #mv /tmp/cache/install/HASH /tmp/cache/install/${MANIFEST_HASH}
 
-echo "${RPM_BUILD_DIR}"
-
-pwd
 cd proxy
 
 bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root build --config=release --fetch=false //...
@@ -99,7 +96,7 @@ bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_B
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 
-cp -pav bazel-bin/src/envoy/envoy $RPM_BUILD_ROOT%{_bindir}/
+cp -pav ${RPM_BUILD_DIR}/proxy/proxy/bazel-bin/src/envoy/envoy $RPM_BUILD_ROOT%{_bindir}/
 
 %files envoy
 %{_bindir}/envoy
