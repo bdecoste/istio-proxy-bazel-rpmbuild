@@ -59,12 +59,20 @@ istio-proxy is the proxy required by the Istio Pilot Agent that talks to Istio p
 %prep
 %setup -q -n %{name}
 
+INSTALLED_BAZEL=$(which bazel)
+if [[ ${INSTALLED_BAZEL} = *"no bazel in"* ]]; then
+    sh %{SOURCE1}
+fi
+
+if [[ ${PATH} != *"devtoolset"* ]]; then
+    source /opt/rh/devtoolset-4/enable
+fi
+
 tar xvf %{SOURCE2} -C /tmp
 
 %build
 
-mkdir -p /tmp/tmpcache
-#bazel --output_user_root=/tmp/cache version
+#bazel --output_user_root=/tmp/cache fetch //...
 bazel --output_user_root=/tmp/tmpcache build --config=release --fetch=false //... || :
 
 pushd /tmp/tmpcache
