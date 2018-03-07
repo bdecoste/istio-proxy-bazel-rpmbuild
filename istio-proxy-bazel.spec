@@ -22,8 +22,6 @@
 %global provider_prefix %{provider}.%{provider_tld}/%{project}/%{repo}
 %global import_path     proxy
 
-%define _disable_source_fetch 0
-
 Name:           proxy
 Version:        0.6.%{git_bump}.git.%{git_shortcommit}
 Release:        1%{?dist}
@@ -36,6 +34,7 @@ BuildRequires:  devtoolset-4-gcc-c++
 BuildRequires:  devtoolset-4-libatomic-devel
 BuildRequires:  devtoolset-4-libstdc++-devel
 BuildRequires:  devtoolset-4-runtime
+BuildRequires:  strace
 # TODO: Change to a release version
 Source0:        proxy-full.tar.gz
 #Source1:        bazel-0.11.0-installer-linux-x86_64.sh
@@ -108,7 +107,7 @@ cd proxy
 #ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/jre ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/jre
 #ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/lib ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/lib
 
-bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root build --config=release --fetch=false //...
+strace bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root build --config=release --fetch=false //...
 
 %install
 rm -rf $RPM_BUILD_ROOT
