@@ -30,6 +30,12 @@ Release:        1%{?dist}
 Summary:        The Istio Proxy is a microservice proxy that can be used on the client and server side, and forms a microservice mesh. The Proxy supports a large number of features.
 License:        ASL 2.0
 URL:            https://%{provider_prefix}
+BuildRequires:  bazel
+BuildRequires:  devtoolset-4-gcc
+BuildRequires:  devtoolset-4-gcc-c++
+BuildRequires:  devtoolset-4-libatomic-devel
+BuildRequires:  devtoolset-4-libstdc++-devel
+BuildRequires:  devtoolset-4-runtime
 # TODO: Change to a release version
 Source0:        proxy-full.tar.gz
 #Source1:        bazel-0.11.0-installer-linux-x86_64.sh
@@ -68,7 +74,7 @@ if [[ ${PATH} != *"devtoolset"* ]]; then
     source /opt/rh/devtoolset-4/enable
 fi
 
-#tar xvf %{SOURCE2} -C /tmp
+#tar xvf %{SOURCE2} -C /tmpid.fedoraproject.org
 
 %build
 
@@ -89,6 +95,18 @@ fi
 #mv /tmp/cache/install/HASH /tmp/cache/install/${MANIFEST_HASH}
 
 cd proxy
+
+#ln -s /usr/local/go/api ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/api
+#ln -s /usr/local/go/bin ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/bin
+#ln -s /usr/local/go/lib ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/lib
+#ln -s /usr/local/go/misc ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/misc
+#ln -s /usr/local/go/pkg ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/pkg
+#ln -s /usr/local/go/src ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/src
+
+#ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/bin ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/bin
+#ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/include ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/include
+#ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/jre ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/jre
+#ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/lib ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/lib
 
 bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root build --config=release --fetch=false //...
 
