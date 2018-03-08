@@ -34,7 +34,14 @@ BuildRequires:  devtoolset-4-gcc-c++
 BuildRequires:  devtoolset-4-libatomic-devel
 BuildRequires:  devtoolset-4-libstdc++-devel
 BuildRequires:  devtoolset-4-runtime
-BuildRequires:  strace
+BuildRequires:  wget
+BuildRequires:  git
+BuildRequires:  cmake3
+BuildRequires:  libtool
+BuildRequires:  golang
+
+#BuildRequires:  strace
+
 # TODO: Change to a release version
 Source0:        proxy-full.tar.gz
 #Source1:        bazel-0.11.0-installer-linux-x86_64.sh
@@ -63,6 +70,12 @@ istio-proxy is the proxy required by the Istio Pilot Agent that talks to Istio p
 
 %prep
 %setup -q -n %{name}
+
+ME=$(whoami)
+chown -R ${ME}:${ME} ${RPM_BUILD_DIR}/proxy
+
+rm -rf /usr/bin/cmake
+ln -s /usr/bin/cmake3 /usr/bin/cmake
 
 #INSTALLED_BAZEL=$(which bazel)
 #if [[ ${INSTALLED_BAZEL} = *"no bazel in"* ]]; then
@@ -107,16 +120,18 @@ cd proxy
 #ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/jre ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/jre
 #ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/lib ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/lib
 
-strace bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root build --config=release --fetch=false //...
+bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root --batch build --config=release //...
+#bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root --batch build --config=release --fetch=false //...
+#bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root --batch version 
 
 %install
-rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
+#rm -rf $RPM_BUILD_ROOT
+#mkdir -p $RPM_BUILD_ROOT%{_bindir}
 
-cp -pav ${RPM_BUILD_DIR}/proxy/proxy/bazel-bin/src/envoy/envoy $RPM_BUILD_ROOT%{_bindir}/
+#cp -pav ${RPM_BUILD_DIR}/proxy/proxy/bazel-bin/src/envoy/envoy $RPM_BUILD_ROOT%{_bindir}/
 
-%files envoy
-%{_bindir}/envoy
+#%files envoy
+#%{_bindir}/envoy
 
 %changelog
 * Mon Mar 5 2018 Bill DeCoste <wdecoste@redhat.com>
