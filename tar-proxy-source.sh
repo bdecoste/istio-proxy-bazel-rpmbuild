@@ -13,6 +13,8 @@ popd
 
 rm -rf proxy/bazel/base/external/envoy_deps_cache_fbe7fd77b8354b9a6f47b8e24c1a5f25
 
+cp -rf proxy/recipes/*.sh proxy/bazel/base/external/envoy/ci/build_container/build_recipes
+
 rm -rf proxy-full.tar.gz
 tar cvf proxy-full.tar proxy
 gzip proxy-full.tar

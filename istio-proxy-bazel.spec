@@ -76,6 +76,10 @@ chown -R ${ME}:${ME} ${RPM_BUILD_DIR}/proxy
 
 rm -rf /usr/bin/cmake
 ln -s /usr/bin/cmake3 /usr/bin/cmake
+rm -rf /usr/bin/aclocal-1.15
+ln -s /usr/bin/aclocal /usr/bin/aclocal-1.15
+rm -rf /usr/bin/automake-1.15
+ln -s /usr/bin/automake /usr/bin/automake-1.15
 
 #INSTALLED_BAZEL=$(which bazel)
 #if [[ ${INSTALLED_BAZEL} = *"no bazel in"* ]]; then
