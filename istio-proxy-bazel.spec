@@ -81,51 +81,15 @@ ln -s /usr/bin/aclocal /usr/bin/aclocal-1.15
 rm -rf /usr/bin/automake-1.15
 ln -s /usr/bin/automake /usr/bin/automake-1.15
 
-#INSTALLED_BAZEL=$(which bazel)
-#if [[ ${INSTALLED_BAZEL} = *"no bazel in"* ]]; then
-#    sh %{SOURCE1}
-#fi
-
 if [[ ${PATH} != *"devtoolset"* ]]; then
     source /opt/rh/devtoolset-4/enable
 fi
 
-#tar xvf %{SOURCE2} -C /tmpid.fedoraproject.org
-
 %build
-
-#bazel --output_user_root=/tmp/cache fetch //...
-#bazel --output_user_root=/tmp/tmpcache build --config=release --fetch=false //... || :
-
-#pushd /tmp/tmpcache
-#WORKSPACE_HASH=$(find . -maxdepth 1 -type d -not -name "HASH" -not -name "install" | sed "s/.//" | sed "s/\///")
-#WORKSPACE_HASH=$(echo $WORKSPACE_HASH)
-#popd
-
-#pushd /tmp/tmpcache/install
-#MANIFEST_HASH=$(find . -maxdepth 1 -type d -not -name "HASH" -not -name "install" | sed "s/.//" | sed "s/\///")
-#MANIFEST_HASH=$(echo $MANIFEST_HASH)
-#popd
-
-#mv /tmp/cache/HASH /tmp/cache/${WORKSPACE_HASH}
-#mv /tmp/cache/install/HASH /tmp/cache/install/${MANIFEST_HASH}
 
 cd proxy
 
-#ln -s /usr/local/go/api ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/api
-#ln -s /usr/local/go/bin ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/bin
-#ln -s /usr/local/go/lib ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/lib
-#ln -s /usr/local/go/misc ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/misc
-#ln -s /usr/local/go/pkg ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/pkg
-#ln -s /usr/local/go/src ${RPM_BUILD_DIR}/proxy/bazel/base/external/go_sdk/src
-
-#ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/bin ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/bin
-#ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/include ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/include
-#ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/jre ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/jre
-#ln -s /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/lib ${RPM_BUILD_DIR}/proxy/bazel/root/install/0ee37c46238c245908cbdbda1c10dbff/_embedded_binaries/embedded_tools/jdk/lib
-
 bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root --batch build --config=release //...
-#bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root --batch build --config=release --fetch=false //...
 #bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root --batch version 
 
 %install
