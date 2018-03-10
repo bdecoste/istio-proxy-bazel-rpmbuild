@@ -3,20 +3,25 @@ set -x
 mkdir /tmp/proxy
 pushd /tmp/proxy
 
+#clone proxy
 if [ ! -d "proxy" ]; then
-  #clone proxy
   PROXY_VERSION=0.6.0
   git clone https://github.com/istio/proxy -b ${PROXY_VERSION}
 fi
 
+#clone dependency source and custom recipes
 if [ ! -d "recipes" ]; then
   git clone https://github.com/bdecoste/proxy-rpm
   mv proxy-rpm/proxy/* .
   rm -rf proxy-rpm
 fi
 
-if [ ! -d "bazelorig" ]; then
-  #fetch 
+#bazel fetch
+if [ ! -d "bazelorig" ]; then 
+  if [[ ${PATH} != *"devtoolset"* ]]; then
+    source /opt/rh/devtoolset-4/enable
+  fi
+
   pushd /tmp/proxy/proxy
   bazel --output_base=/tmp/proxy/bazel/base --output_user_root=/tmp/proxy/bazel/root --batch fetch //...
   popd
@@ -72,9 +77,6 @@ rm -rf bazel/base/external/envoy_deps_cache_${ENVOY_HASH}
 
 # use custom dependency recipes
 cp -rf recipes/*.sh bazel/base/external/envoy/ci/build_container/build_recipes
-
-# remove hardcoded path for g++
-cp -f CROSSTOOL bazel/base/external/local_config_cc/CROSSTOOL
 
 popd
 
