@@ -28,7 +28,7 @@ fi
 rm -rf bazel
 cp -rfp bazelorig bazel
 
-INSTALL_HASH=b07116f6378102e62e71914d3f6dd73a
+INSTALL_HASH=e85ea7cbd5c513a863eccd3090ecfbd5
 
 pushd /tmp/proxy/bazel
 find . -lname '/*' -exec ksh -c '
@@ -43,6 +43,7 @@ find . -lname '/*' -exec ksh -c '
     target=$(echo $target | sed "s|../../tmp/proxy/bazel/base|../../base|")
     target=$(echo $target | sed "s|../../../tmp/proxy/bazel/root|../../../root|")
     target=$(echo $target | sed "s|../tmp/proxy/bazel/root|../root|")
+    target=$(echo $target | sed "s|../../../usr/lib/jvm|/usr/lib/jvm|")
 #   echo "after  $target    $link"
     ln -s "$target" "$link"
   done
@@ -64,16 +65,6 @@ ln -s ${GO_HOME}/lib bazel/base/external/go_sdk/lib
 ln -s ${GO_HOME}/pkg bazel/base/external/go_sdk/pkg
 ln -s ${GO_HOME}/src bazel/base/external/go_sdk/src
 ln -s ${GO_HOME}/test bazel/base/external/go_sdk/test
-
-#prune jdk
-#JDK_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64
-#rm -rf bazel/root/install/${INSTALL_HASH}/_embedded_binaries/embedded_tools/jdk/{bin,include,jre,lib,demo}
-#ln -s ${JDK_HOME}/bin bazel/root/install/${INSTALL_HASH}/_embedded_binaries/embedded_tools/jdk/bin
-#ln -s ${JDK_HOME}/include bazel/root/install/${INSTALL_HASH}/_embedded_binaries/embedded_tools/jdk/include
-#ln -s ${JDK_HOME}/jre bazel/root/install/${INSTALL_HASH}/_embedded_binaries/embedded_tools/jdk/jre
-#ln -s ${JDK_HOME}/lib bazel/root/install/${INSTALL_HASH}/_embedded_binaries/embedded_tools/jdk/lib
-#cp -f bazelorig/root/install/${INSTALL_HASH}/_embedded_binaries/A-server.jar bazel/root/install/${INSTALL_HASH}/_embedded_binaries/A-server.jar
-
 
 # remove fetch-build
 ENVOY_HASH=2c744dffd279d7e9e0910ce594eb4f4f
