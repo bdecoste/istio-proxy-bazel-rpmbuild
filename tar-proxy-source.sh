@@ -73,6 +73,9 @@ rm -rf bazel/base/external/envoy_deps_cache_${ENVOY_HASH}
 # use custom dependency recipes
 cp -rf recipes/*.sh bazel/base/external/envoy/ci/build_container/build_recipes
 
+# remove hardcoded path for g++
+cp -f CROSSTOOL bazel/base/external/local_config_cc/CROSSTOOL
+
 popd
 
 # create tarball
