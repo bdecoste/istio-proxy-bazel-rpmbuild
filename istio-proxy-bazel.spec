@@ -16,14 +16,14 @@
 
 %global provider        github
 %global provider_tld    com
-%global project         istio
-%global repo            proxy
+%global project         istio-proxy
+%global repo            istio-proxy
 # https://github.com/istio/proxy
 %global provider_prefix %{provider}.%{provider_tld}/%{project}/%{repo}
 %global import_path     proxy
 
-Name:           proxy
-Version:        0.6.%{git_bump}.git.%{git_shortcommit}
+Name:           istio-proxy
+Version:        0.6.0
 Release:        1%{?dist}
 Summary:        The Istio Proxy is a microservice proxy that can be used on the client and server side, and forms a microservice mesh. The Proxy supports a large number of features.
 License:        ASL 2.0
@@ -43,9 +43,7 @@ BuildRequires:  golang
 #BuildRequires:  strace
 
 # TODO: Change to a release version
-Source0:        proxy-full.tar.gz
-#Source1:        bazel-0.11.0-installer-linux-x86_64.sh
-#Source2:        proxy-prefetch.tar.gz
+Source0:        proxy-full.tar.xz
 
 
 # e.g. el6 has ppc64 arch without gcc-go, so EA tag is required
@@ -57,11 +55,11 @@ Source0:        proxy-full.tar.gz
 The Istio Proxy is a microservice proxy that can be used on the client and server side, and forms a microservice mesh. The Proxy supports a large number of features.
 
 ########### istio-proxy ###############
-%package envoy
+%package istio-proxy
 Summary:  The istio envoy proxy
 Requires: istio-proxy = %{version}-%{release}
 
-%description envoy
+%description istio-proxy
 The Istio Proxy is a microservice proxy that can be used on the client and server side, and forms a microservice mesh. The Proxy supports a large number of features.
 
 This package contains the envoy program.
@@ -72,7 +70,7 @@ istio-proxy is the proxy required by the Istio Pilot Agent that talks to Istio p
 %setup -q -n %{name}
 
 ME=$(whoami)
-chown -R ${ME}:${ME} ${RPM_BUILD_DIR}/proxy
+chown -R ${ME}:${ME} ${RPM_BUILD_DIR}/istio-proxy
 
 rm -rf /usr/bin/cmake
 ln -s /usr/bin/cmake3 /usr/bin/cmake
@@ -81,25 +79,30 @@ ln -s /usr/bin/aclocal /usr/bin/aclocal-1.15
 rm -rf /usr/bin/automake-1.15
 ln -s /usr/bin/automake /usr/bin/automake-1.15
 
-if [[ ${PATH} != *"devtoolset"* ]]; then
-    source /opt/rh/devtoolset-4/enable
-fi
+#if [[ ${PATH} != *"devtoolset"* ]]; then
+#    source /opt/rh/devtoolset-4/enable
+#fi
+
+echo $PATH
+which g++
+g++ --version
 
 %build
 
 cd proxy
 
-bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root --batch build --config=release //...
+bazel --output_base=${RPM_BUILD_DIR}/istio-proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/istio-proxy/bazel/root --batch build --config=release "//..."
+#bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root --batch build --config=release "//src/envoy -//external:android/crosstool -//external:android/sdk -//external:android/dx_jar_import -//external:android_sdk_for_testing -//external:android_ndk_for_testing -//external:has_androidsdk -//external:java_toolchain -//external:databinding_annotation_processor -//external:local_jdk -//external:jre-default -//external:jre -//external:jni_md_header-linux -//external:jni_md_header-freebsd -//external:jni_md_header-darwin -//external:jni_header -//external:jinja2 -//external:jdk-default -//external:jdk -//external:javac -//external:java_toolchain -//external:java -//external:jar -//external:go_sdk -//tools/deb:all -//:deb_version -//:darwin -//src/envoy:envoy_tar"
 #bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root --batch version 
 
 %install
-#rm -rf $RPM_BUILD_ROOT
-#mkdir -p $RPM_BUILD_ROOT%{_bindir}
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT%{_bindir}
 
-#cp -pav ${RPM_BUILD_DIR}/proxy/proxy/bazel-bin/src/envoy/envoy $RPM_BUILD_ROOT%{_bindir}/
+cp -pav ${RPM_BUILD_DIR}/istio-proxy/proxy/bazel-bin/src/envoy/envoy $RPM_BUILD_ROOT%{_bindir}/
 
-#%files envoy
-#%{_bindir}/envoy
+%files istio-proxy
+%{_bindir}/envoy
 
 %changelog
 * Mon Mar 5 2018 Bill DeCoste <wdecoste@redhat.com>

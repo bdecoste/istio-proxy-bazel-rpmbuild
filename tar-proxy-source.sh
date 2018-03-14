@@ -1,7 +1,7 @@
 set -x
 
-mkdir /tmp/proxy
-pushd /tmp/proxy
+mkdir /tmp/istio-proxy
+pushd /tmp/istio-proxy
 
 #clone proxy
 if [ ! -d "proxy" ]; then
@@ -22,20 +22,21 @@ if [ ! -d "bazelorig" ]; then
     source /opt/rh/devtoolset-4/enable
   fi
 
-  pushd /tmp/proxy/proxy
-  bazel --output_base=/tmp/proxy/bazel/base --output_user_root=/tmp/proxy/bazel/root --batch fetch //...
+  pushd /tmp/istio-proxy/proxy
+  bazel --output_base=/tmp/istio-proxy/bazel/base --output_user_root=/tmp/istio-proxy/bazel/root --batch fetch //...
+#  bazel --output_base=/tmp/proxy/bazel/base --output_user_root=/tmp/proxy/bazel/root --batch fetch "//src/envoy -//external:android/crosstool -//external:android/sdk -//external:android/dx_jar_import -//external:android_sdk_for_testing -//external:android_ndk_for_testing -//external:has_androidsdk -//external:java_toolchain -//external:databinding_annotation_processor -//external:local_jdk -//external:jre-default -//external:jre -//external:jni_md_header-linux -//external:jni_md_header-freebsd -//external:jni_md_header-darwin -//external:jni_header -//external:jinja2 -//external:jdk-default -//external:jdk -//external:javac -//external:java_toolchain -//external:java -//external:jar -//external:go_sdk -//tools/deb:all -//:deb_version -//:darwin -//src/envoy:envoy_tar"
   popd
   cp -rfp bazel bazelorig
 fi
+
+INSTALL_HASH=$(ls bazel/root/install)
 
 # replace links with copies (links are fully qualified paths so don't travel)
 #cp -rfL /tmp/bazel proxy
 rm -rf bazel
 cp -rfp bazelorig bazel
 
-INSTALL_HASH=e85ea7cbd5c513a863eccd3090ecfbd5
-
-pushd /tmp/proxy/bazel
+pushd /tmp/istio-proxy/bazel
 find . -lname '/*' -exec ksh -c '
   for link; do
     target=$(readlink "$link")
@@ -43,23 +44,30 @@ find . -lname '/*' -exec ksh -c '
     root=${link//+([!\/])/..}; root=${root#/}; root=${root%..}
     rm "$link"
     target="$root${target#/}"
-#    echo "before $target    $link"
-    target=$(echo $target | sed "s|../../../tmp/proxy/bazel/base|../../../base|")
-    target=$(echo $target | sed "s|../../tmp/proxy/bazel/base|../../base|")
-    target=$(echo $target | sed "s|../../../tmp/proxy/bazel/root|../../../root|")
-    target=$(echo $target | sed "s|../tmp/proxy/bazel/root|../root|")
+    target=$(echo $target | sed "s|../../../tmp/istio-proxy/bazel/base|../../../base|")
+    target=$(echo $target | sed "s|../../tmp/istio-proxy/bazel/base|../../base|")
+    target=$(echo $target | sed "s|../../../tmp/istio-proxy/bazel/root|../../../root|")
+    target=$(echo $target | sed "s|../tmp/istio-proxy/bazel/root|../root|")
     target=$(echo $target | sed "s|../../../usr/lib/jvm|/usr/lib/jvm|")
-#   echo "after  $target    $link"
     ln -s "$target" "$link"
   done
 ' _ {} +
 popd
+
+#prune native 
+#rm bazel/root/install/${INSTALL_HASH}/_embedded_binaries/embedded_tools/src/main/native/BUILD
 
 #prune git
 find . -name ".git*" | xargs rm -rf
 
 #prune logs
 find . -name "*.log" | xargs rm -rf
+
+#prune gzip
+#find . -name "*.gz" | xargs rm -rf
+
+#clean
+rm -rf proxy/bazel-*
 
 #prune go sdk
 GO_HOME=/usr/lib/golang
@@ -71,8 +79,32 @@ ln -s ${GO_HOME}/pkg bazel/base/external/go_sdk/pkg
 ln -s ${GO_HOME}/src bazel/base/external/go_sdk/src
 ln -s ${GO_HOME}/test bazel/base/external/go_sdk/test
 
+#prune boringssl tests
+#rm -rf boringssl/crypto/cipher_extra/test
+
+#prune grpc tests
+rm -rf bazel/base/external/com_github_grpc_grpc/test
+
+#prune build_tools
+cp -rf BUILD.bazel bazel/base/external/io_bazel_rules_go/go/toolchain/BUILD.bazel
+
+#prune unecessary files
+pushd /tmp/istio-proxy/bazel
+#find . -name "*.html" | xargs rm -rf
+#find . -name "*.zip" | xargs rm -rf
+find . -name "example" | xargs rm -rf
+find . -name "examples" | xargs rm -rf
+find . -name "sample" | xargs rm -rf
+find . -name "samples" | xargs rm -rf
+#find . -name "android" | xargs rm -rf
+#find . -name "osx" | xargs rm -rf
+find . -name "*.a" | xargs rm -rf
+#find . -name "*.so" | xargs rm -rf
+rm -rf bazel/base/external/go_sdk/src/archive/
+popd
+
 # remove fetch-build
-ENVOY_HASH=2c744dffd279d7e9e0910ce594eb4f4f
+ENVOY_HASH=fbe7fd77b8354b9a6f47b8e24c1a5f25
 rm -rf bazel/base/external/envoy_deps_cache_${ENVOY_HASH}
 
 # use custom dependency recipes
@@ -82,9 +114,9 @@ popd
 
 # create tarball
 pushd /tmp
-rm -rf proxy-full.tar.gz
-tar cvf proxy-full.tar proxy --exclude=proxy/bazelorig --atime-preserve
-gzip proxy-full.tar
+rm -rf proxy-full.tar.xz
+tar cf proxy-full.tar istio-proxy --exclude=istio-proxy/bazelorig --atime-preserve
+xz proxy-full.tar
 popd
 
 
