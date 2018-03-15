@@ -70,14 +70,14 @@ find . -name "*.log" | xargs rm -rf
 rm -rf proxy/bazel-*
 
 #prune go sdk
-GO_HOME=/usr/lib/golang
-rm -rf bazel/base/external/go_sdk/{api,bin,lib,pkg,src,test,misc,doc,blog}
-ln -s ${GO_HOME}/api bazel/base/external/go_sdk/api
-ln -s ${GO_HOME}/bin bazel/base/external/go_sdk/bin
-ln -s ${GO_HOME}/lib bazel/base/external/go_sdk/lib
-ln -s ${GO_HOME}/pkg bazel/base/external/go_sdk/pkg
-ln -s ${GO_HOME}/src bazel/base/external/go_sdk/src
-ln -s ${GO_HOME}/test bazel/base/external/go_sdk/test
+#GO_HOME=/usr/lib/golang
+#rm -rf bazel/base/external/go_sdk/{api,bin,lib,pkg,wrc,test,misc,doc,blog}
+#ln -s ${GO_HOME}/api bazel/base/external/go_sdk/api
+#ln -s ${GO_HOME}/bin bazel/base/external/go_sdk/bin
+#ln -s ${GO_HOME}/lib bazel/base/external/go_sdk/lib
+#ln -s ${GO_HOME}/pkg bazel/base/external/go_sdk/pkg
+#ln -s ${GO_HOME}/src bazel/base/external/go_sdk/src
+#ln -s ${GO_HOME}/test bazel/base/external/go_sdk/test
 
 #prune boringssl tests
 #rm -rf boringssl/crypto/cipher_extra/test
@@ -86,26 +86,26 @@ ln -s ${GO_HOME}/test bazel/base/external/go_sdk/test
 rm -rf bazel/base/external/com_github_grpc_grpc/test
 
 #prune build_tools
-cp -rf BUILD.bazel bazel/base/external/io_bazel_rules_go/go/toolchain/BUILD.bazel
+#cp -rf BUILD.bazel bazel/base/external/io_bazel_rules_go/go/toolchain/BUILD.bazel
 
 #prune unecessary files
 pushd /tmp/istio-proxy/bazel
-#find . -name "*.html" | xargs rm -rf
-#find . -name "*.zip" | xargs rm -rf
-find . -name "example" | xargs rm -rf
-find . -name "examples" | xargs rm -rf
-find . -name "sample" | xargs rm -rf
-find . -name "samples" | xargs rm -rf
-#find . -name "android" | xargs rm -rf
-#find . -name "osx" | xargs rm -rf
-find . -name "*.a" | xargs rm -rf
-#find . -name "*.so" | xargs rm -rf
-rm -rf bazel/base/external/go_sdk/src/archive/
+##find . -name "*.html" | xargs rm -rf
+##find . -name "*.zip" | xargs rm -rf
+#find . -name "example" | xargs rm -rf
+#find . -name "examples" | xargs rm -rf
+#find . -name "sample" | xargs rm -rf
+#find . -name "samples" | xargs rm -rf
+##find . -name "android" | xargs rm -rf
+##find . -name "osx" | xargs rm -rf
+#find . -name "*.a" | xargs rm -rf
+##find . -name "*.so" | xargs rm -rf
+#rm -rf bazel/base/external/go_sdk/src/archive/
 popd
 
 # remove fetch-build
-ENVOY_HASH=fbe7fd77b8354b9a6f47b8e24c1a5f25
-rm -rf bazel/base/external/envoy_deps_cache_${ENVOY_HASH}
+#ENVOY_HASH=fbe7fd77b8354b9a6f47b8e24c1a5f25
+rm -rf bazel/base/external/envoy_deps_cache_*
 
 # use custom dependency recipes
 cp -rf recipes/*.sh bazel/base/external/envoy/ci/build_container/build_recipes
