@@ -22,9 +22,14 @@ if [ ! -d "bazelorig" ]; then
     source /opt/rh/devtoolset-4/enable
   fi
 
+#  if [[ ${PATH} != *"llvm-toolset"* ]]; then
+#    source /opt/rh/llvm-toolset-7/enable
+#  fi
+
   pushd /tmp/istio-proxy/proxy
   bazel --output_base=/tmp/istio-proxy/bazel/base --output_user_root=/tmp/istio-proxy/bazel/root --batch fetch //...
 #  bazel --output_base=/tmp/proxy/bazel/base --output_user_root=/tmp/proxy/bazel/root --batch fetch "//src/envoy -//external:android/crosstool -//external:android/sdk -//external:android/dx_jar_import -//external:android_sdk_for_testing -//external:android_ndk_for_testing -//external:has_androidsdk -//external:java_toolchain -//external:databinding_annotation_processor -//external:local_jdk -//external:jre-default -//external:jre -//external:jni_md_header-linux -//external:jni_md_header-freebsd -//external:jni_md_header-darwin -//external:jni_header -//external:jinja2 -//external:jdk-default -//external:jdk -//external:javac -//external:java_toolchain -//external:java -//external:jar -//external:go_sdk -//tools/deb:all -//:deb_version -//:darwin -//src/envoy:envoy_tar"
+#bazel --output_base=/tmp/istio-proxy/bazel/base --output_user_root=/tmp/istio-proxy/bazel/root --batch fetch --experimental_external_repositories --experimental_repository_cache=/tmp/istio-proxy/bazel/X //...
   popd
   cp -rfp bazel bazelorig
 fi
@@ -115,7 +120,7 @@ popd
 # create tarball
 pushd /tmp
 rm -rf proxy-full.tar.xz
-tar cf proxy-full.tar istio-proxy --exclude=istio-proxy/bazelorig --atime-preserve
+tar cf proxy-full.tar istio-proxy --exclude=istio-proxy/bazelorig --exclude=istio-proxy/bazel/X --atime-preserve
 xz proxy-full.tar
 popd
 

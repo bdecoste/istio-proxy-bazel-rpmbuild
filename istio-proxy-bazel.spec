@@ -9,13 +9,12 @@
 %global debug_package   %{nil}
 %endif
 
+# https://github.com/istio/proxy
 %global provider        github
 %global provider_tld    com
 %global project         istio
 %global repo            proxy
-# https://github.com/istio/proxy
 %global provider_prefix %{provider}.%{provider_tld}/%{project}/%{repo}
-%global import_path     proxy
 
 Name:           istio-proxy
 Version:        0.6.0
@@ -77,6 +76,8 @@ export PATH=$(pwd):$PATH
 cd proxy
 
 bazel --output_base=${RPM_BUILD_DIR}/istio-proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/istio-proxy/bazel/root --batch build --config=release "//..."
+#bazel --batch build --config=release --experimental_external_repositories --experimental_repository_cache=${RPM_BUILD_DIR}/istio-proxy/bazel/X "//..."
+
 #bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root --batch build --config=release "//src/envoy -//external:android/crosstool -//external:android/sdk -//external:android/dx_jar_import -//external:android_sdk_for_testing -//external:android_ndk_for_testing -//external:has_androidsdk -//external:java_toolchain -//external:databinding_annotation_processor -//external:local_jdk -//external:jre-default -//external:jre -//external:jni_md_header-linux -//external:jni_md_header-freebsd -//external:jni_md_header-darwin -//external:jni_header -//external:jinja2 -//external:jdk-default -//external:jdk -//external:javac -//external:java_toolchain -//external:java -//external:jar -//external:go_sdk -//tools/deb:all -//:deb_version -//:darwin -//src/envoy:envoy_tar"
 #bazel --output_base=${RPM_BUILD_DIR}/proxy/bazel/base --output_user_root=${RPM_BUILD_DIR}/proxy/bazel/root --batch version 
 
@@ -86,7 +87,7 @@ mkdir -p $RPM_BUILD_ROOT%{_bindir}
 
 cp -pav ${RPM_BUILD_DIR}/istio-proxy/proxy/bazel-bin/src/envoy/envoy $RPM_BUILD_ROOT%{_bindir}/
 
-%files istio-proxy
+%files
 %{_bindir}/envoy
 
 %changelog
