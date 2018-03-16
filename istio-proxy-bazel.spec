@@ -16,7 +16,7 @@
 %global repo            proxy
 %global provider_prefix %{provider}.%{provider_tld}/%{project}/%{repo}
 
-%define distribution        %(cat /etc/redhat-release | awk '{print $1;}')
+%define distribution    %(cat /etc/redhat-release | awk '{print $1;}')
 
 Name:           istio-proxy
 Version:        0.6.0
