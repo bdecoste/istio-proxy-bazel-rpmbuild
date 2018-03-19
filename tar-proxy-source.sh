@@ -22,9 +22,9 @@ if [ ! -d "bazelorig" ]; then
     source /opt/rh/devtoolset-4/enable
   fi
 
-#  if [[ ${PATH} != *"llvm-toolset"* ]]; then
-#    source /opt/rh/llvm-toolset-7/enable
-#  fi
+  if [[ ${PATH} != *"llvm-toolset"* ]]; then
+    source /opt/rh/llvm-toolset-7/enable
+  fi
 
   pushd /tmp/istio-proxy/proxy
   bazel --output_base=/tmp/istio-proxy/bazel/base --output_user_root=/tmp/istio-proxy/bazel/root --batch fetch //...

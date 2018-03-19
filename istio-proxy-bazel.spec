@@ -48,6 +48,8 @@ BuildRequires:  cmake3
 %endif
 
 Source0:        proxy-full.tar.xz
+Source1:        istiorc
+Source2:        buildinfo
 
 %description
 The Istio Proxy is a microservice proxy that can be used on the client and server side, and forms a microservice mesh. The Proxy supports a large number of features.
@@ -68,7 +70,7 @@ istio-proxy is the proxy required by the Istio Pilot Agent that talks to Istio p
 
 %build
 
-echo "Building for" %{distribution}
+echo "Building for" %{distribution} 
 
 #CENTOS
 %if %{distribution} == CentOS
@@ -101,12 +103,12 @@ bazel --output_base=${RPM_BUILD_DIR}/istio-proxy/bazel/base --output_user_root=$
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
+mkdir -p ${RPM_BUILD_ROOT}/usr/local/bin
 
-cp -pav ${RPM_BUILD_DIR}/istio-proxy/proxy/bazel-bin/src/envoy/envoy $RPM_BUILD_ROOT%{_bindir}/
+cp -pav ${RPM_BUILD_DIR}/istio-proxy/proxy/bazel-bin/src/envoy/envoy ${RPM_BUILD_ROOT}/usr/local/bin
 
 %files
-%{_bindir}/envoy
+/usr/local/bin/envoy
 
 %changelog
 * Mon Mar 5 2018 Bill DeCoste <wdecoste@redhat.com>
