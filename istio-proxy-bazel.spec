@@ -16,8 +16,6 @@
 %global repo            proxy
 %global provider_prefix %{provider}.%{provider_tld}/%{project}/%{repo}
 
-%define distribution    %(cat /etc/redhat-release | awk '{print $1;}')
-
 Name:           istio-proxy
 Version:        0.6.0
 Release:        2%{?dist}
@@ -35,21 +33,15 @@ BuildRequires:  devtoolset-4-runtime
 BuildRequires:  libtool
 BuildRequires:  golang
 
-#RHEL
-%if %{distribution} == Red
+%if 0%{?centos} >= 7
+BuildRequires:  cmake3
+%else
 BuildRequires:  llvm-toolset-7-cmake
 BuildRequires:  llvm-toolset-7-runtime
 BuildRequires:  llvm-toolset-7-cmake-data
 %endif
 
-#CENTOS
-%if %{distribution} == CentOS
-BuildRequires:  cmake3
-%endif
-
 Source0:        proxy-full.tar.xz
-Source1:        istiorc
-Source2:        buildinfo
 
 %description
 The Istio Proxy is a microservice proxy that can be used on the client and server side, and forms a microservice mesh. The Proxy supports a large number of features.
@@ -72,13 +64,9 @@ istio-proxy is the proxy required by the Istio Pilot Agent that talks to Istio p
 
 echo "Building for" %{distribution} 
 
-#CENTOS
-%if %{distribution} == CentOS
+%if 0%{?centos} >= 7
 ln -s /usr/bin/cmake3 cmake
-%endif
-
-#RHEL
-%if %{distribution} == Red
+%else
 if [[ ${PATH} != *"llvm-toolset"* ]]; then
   source /opt/rh/llvm-toolset-7/enable
 fi
